@@ -1,17 +1,22 @@
 import bisect
 import sys
-import json
 from dataclasses import dataclass, field
 
-from textual.widgets.tree import TreeNode
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, Tree
+from textual.widgets.tree import TreeNode
 
 
 @dataclass
 class Node:
     value: str
-    children: list = field(default_factory=list)
+    children: list["Node"] = field(default_factory=list)
+
+
+def _print_nodes(node, indent=0):
+    print(indent * "  ", node.value)
+    for c in node.children:
+        print_nodes(c, indent + 1)
 
 
 def parse_indented(text):
@@ -27,10 +32,11 @@ def parse_indented(text):
         indent = len(line) - len(line.lstrip())
         line = line.strip()
 
+        new = Node(value=line)
         if indent == levels[-1]:
-            objs[-2].children.append(Node(value=line))
+            objs[-2].children.append(new)
+            objs[-1] = new
         elif indent > levels[-1]:
-            new = Node(value=line)
             objs[-1].children.append(new)
             objs.append(new)
             levels.append(indent)
@@ -39,14 +45,10 @@ def parse_indented(text):
             del objs[pos:]
             del levels[pos:]
 
-            new = Node(value=line)
             objs[-1].children.append(new)
             objs.append(new)
             levels.append(indent)
 
-            continue
-            pos = bisect.bisect(levels, indent)
-            objs[-1].children.append(Node(value=line))
     return ret
 
 
@@ -56,10 +58,12 @@ class FoldApp(App):
         ("q", "exit", "quit"),
     ]
 
+    def set_data(self, data):
+        self.data = data
+
     def compose(self) -> ComposeResult:
-        yield Header()
         yield Footer()
-        yield Tree("root")
+        yield Tree("root", id="tree")
 
     def action_exit(self):
         self.exit()
@@ -68,45 +72,18 @@ class FoldApp(App):
         self.dark = not self.dark
 
     def on_mount(self):
-        self.feed(DATA)
-        print(self.feed)
+        self.query_one("#tree").focus()
+        self.feed(self.data)
 
-    def feed(self, data):
+    def search_hidden(self):
+        self.query_one("#tree").focus()
+
+    def feed(self, data: Node):
         tree = self.query_one(Tree)
 
-        def leaf_or_recurse(node, k, obj):
-            if isinstance(obj, (int, bool, str, float, type(None))):
-                node.add_leaf(str(obj))
-            else:
-                sub = node.add(str(k))
-                recurse(sub, obj)
-
-        def recurse(treenode, obj):
-            if isinstance(obj, dict):
-                for k, v in obj.items():
-                    sub = treenode.add(k)
-                    recurse(sub, v)
-                return
-            elif isinstance(obj, list):
-                for n, v in enumerate(obj):
-                    #sub = treenode.add(str(n))
-                    #recurse(sub, v)
-                    leaf_or_recurse(treenode, n, v)
-                return
-            elif isinstance(obj, (int, bool, str, float, type(None))):
-                treenode.add_leaf(str(obj))
-                return
-            raise NotImplementedError(type(obj))
-
-        recurse(tree.root, data)
-        tree.root.expand_all()
-
-    def feed(self, data):
-        tree = self.query_one(Tree)
-
-        def recurse(tnode, dnode):
+        def recurse(tnode: TreeNode, dnode: Node):
             for sdnode in dnode.children:
-                if True or sdnode.children:
+                if sdnode.children:
                     stnode = tnode.add(sdnode.value)
                     recurse(stnode, sdnode)
                 else:
@@ -118,9 +95,8 @@ class FoldApp(App):
 
 if __name__ == "__main__":
     with open(sys.argv[1]) as fp:
-#            self.feed(json.load(fp))
         DATA = parse_indented(fp.read())
-        print(DATA)
 
     app = FoldApp()
+    app.set_data(DATA)
     app.run()
