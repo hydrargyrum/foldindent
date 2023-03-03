@@ -7,7 +7,8 @@ import sys
 from dataclasses import dataclass, field
 
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer, Tree
+from textual.keys import Keys
+from textual.widgets import Footer, Tree as _Tree
 from textual.widgets.tree import TreeNode
 
 
@@ -54,6 +55,32 @@ def parse_indented(text):
             levels.append(indent)
 
     return ret
+
+
+class Tree(_Tree):
+    BINDINGS = [
+        ("^", "go_to_parent", "Parent"),
+        (Keys.Left, "fold_current", "Parent"),
+        (Keys.Right, "expand_current", "Expand"),
+    ]
+
+    def action_go_to_parent(self):
+        self.select_node(self.cursor_node.parent)
+
+    def action_fold_current(self):
+        if self.cursor_node.children and self.cursor_node.is_expanded:
+            self.cursor_node.collapse()
+        else:
+            self.select_node(self.cursor_node.parent)
+
+    def action_expand_current(self):
+        if not self.cursor_node.children:
+            return
+
+        if self.cursor_node.is_expanded:
+            self.select_node(self.cursor_node.children[0])
+        else:
+            self.cursor_node.expand()
 
 
 class FoldApp(App):
