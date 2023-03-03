@@ -1,3 +1,4 @@
+import argparse
 import bisect
 import sys
 from dataclasses import dataclass, field
@@ -58,7 +59,8 @@ class FoldApp(App):
         ("q", "exit", "quit"),
     ]
 
-    def set_data(self, data):
+    def __init__(self, data):
+        super().__init__()
         self.data = data
 
     def compose(self) -> ComposeResult:
@@ -94,9 +96,14 @@ class FoldApp(App):
 
 
 if __name__ == "__main__":
-    with open(sys.argv[1]) as fp:
-        DATA = parse_indented(fp.read())
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument("file")
+    args = argparser.parse_args()
 
-    app = FoldApp()
-    app.set_data(DATA)
+    with open(args.file) as fp:
+        text = fp.read()
+
+    DATA = parse_indented(text)
+
+    app = FoldApp(DATA)
     app.run()
