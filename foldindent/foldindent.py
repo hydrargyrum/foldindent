@@ -125,7 +125,7 @@ class FoldApp(App):
         tree.root.expand_all()
 
 
-if __name__ == "__main__":
+def main():
     argparser = argparse.ArgumentParser()
     argparser.add_argument("file")
     args = argparser.parse_args()
@@ -137,3 +137,7 @@ if __name__ == "__main__":
 
     app = FoldApp(DATA)
     app.run()
+
+
+if __name__ == "__main__":
+    main()
