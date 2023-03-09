@@ -40,21 +40,14 @@ def parse_indented(text):
         line = line.strip()
 
         new = Node(value=line)
-        if indent == levels[-1]:
-            objs[-2].children.append(new)
-            objs[-1] = new
-        elif indent > levels[-1]:
-            objs[-1].children.append(new)
-            objs.append(new)
-            levels.append(indent)
-        else:
-            pos = levels.index(indent)
-            del objs[pos:]
-            del levels[pos:]
 
-            objs[-1].children.append(new)
-            objs.append(new)
-            levels.append(indent)
+        pos = bisect.bisect_left(levels, indent)
+        del objs[pos:]
+        del levels[pos:]
+
+        objs[-1].children.append(new)
+        objs.append(new)
+        levels.append(indent)
 
     return ret
 
