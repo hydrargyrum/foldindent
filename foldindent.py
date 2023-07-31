@@ -61,12 +61,14 @@ class Tree(_Tree):
 
     def action_go_to_parent(self):
         self.select_node(self.cursor_node.parent)
+        self.scroll_to_node(self.cursor_node)
 
     def action_fold_current(self):
         if self.cursor_node.children and self.cursor_node.is_expanded:
             self.cursor_node.collapse()
         else:
             self.select_node(self.cursor_node.parent)
+            self.scroll_to_node(self.cursor_node)
 
     def action_expand_current(self):
         if not self.cursor_node.children:
@@ -74,6 +76,7 @@ class Tree(_Tree):
 
         if self.cursor_node.is_expanded:
             self.select_node(self.cursor_node.children[0])
+            self.scroll_to_node(self.cursor_node)
         else:
             self.cursor_node.expand()
 
