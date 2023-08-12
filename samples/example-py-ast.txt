@@ -1,0 +1,46 @@
+Module(
+   body=[
+      ClassDef(
+         name='Greeter',
+         bases=[],
+         keywords=[],
+         body=[
+            FunctionDef(
+               name='greet',
+               args=arguments(
+                  posonlyargs=[],
+                  args=[
+                     arg(arg='self')],
+                  kwonlyargs=[],
+                  kw_defaults=[],
+                  defaults=[]),
+               body=[
+                  Expr(
+                     value=Call(
+                        func=Name(id='print', ctx=Load()),
+                        args=[
+                           Constant(value='Hello object world!')],
+                        keywords=[]))],
+               decorator_list=[])],
+         decorator_list=[]),
+      Assign(
+         targets=[
+            Name(id='greeter', ctx=Store())],
+         value=Call(
+            func=Name(id='Greeter', ctx=Load()),
+            args=[],
+            keywords=[])),
+      Expr(
+         value=Call(
+            func=Attribute(
+               value=Name(id='greeter', ctx=Load()),
+               attr='greet',
+               ctx=Load()),
+            args=[],
+            keywords=[])),
+      Expr(
+         value=Call(
+            func=Name(id='input', ctx=Load()),
+            args=[],
+            keywords=[]))],
+   type_ignores=[])

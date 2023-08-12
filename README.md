@@ -7,12 +7,15 @@ Each time lines are more indented than previous lines, a foldable point is added
 
 ## Samples
 
-Sample: indented JSON data
+### Sample: indented JSON data
 
-Sample: indented python AST dump
+![foldindent screenshot of indented JSON](samples/sample-json.png)
 
-Sample: TOML config
+### Sample: indented python AST dump
 
+(Source sample text generated with `python3 -m ast samples/example.py`)
+
+![foldindent screenshot of indented AST](samples/sample-ast.png)
 
 ## Keyboard usage
 
