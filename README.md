@@ -9,13 +9,13 @@ Each time lines are more indented than previous lines, a foldable point is added
 
 ### Sample: indented JSON data
 
-![foldindent screenshot of indented JSON](samples/sample-json.png)
+![foldindent screenshot of indented JSON](https://github.com/hydrargyrum/foldindent/blob/main/samples/sample-json.png?raw=true)
 
 ### Sample: indented python AST dump
 
 (Source sample text generated with `python3 -m ast samples/example.py`)
 
-![foldindent screenshot of indented AST](samples/sample-ast.png)
+![foldindent screenshot of indented AST](https://github.com/hydrargyrum/foldindent/blob/main/samples/sample-ast.png?raw=true)
 
 ## Keyboard usage
 
