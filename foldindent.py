@@ -125,11 +125,14 @@ class FoldApp(App):
 
 def main():
     argparser = argparse.ArgumentParser()
-    argparser.add_argument("file")
+    argparser.add_argument("file", type=argparse.FileType('r'), nargs="?", default=sys.stdin)
     args = argparser.parse_args()
 
-    with open(args.file) as fp:
-        text = fp.read()
+    with args.file:
+        text = args.file.read()
+
+    if args.file is sys.stdin:
+        sys.stdin = open("/dev/tty")
 
     DATA = parse_indented(text)
 
