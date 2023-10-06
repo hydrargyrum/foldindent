@@ -21,3 +21,6 @@ Each time lines are more indented than previous lines, a foldable point is added
 
 - `Enter`: fold/expand a node
 - `Up/Down`: navigate cursor one node above/below
+## Install
+
+`pipx install foldindent`
