@@ -84,7 +84,7 @@ class Tree(_Tree):
 class FoldApp(App):
     BINDINGS = [
         ("d", "toggle_dark", "Toggle dark mode"),
-        ("q", "exit", "quit"),
+        ("q", "quit", "Quit"),
     ]
 
     def __init__(self, data):
@@ -95,7 +95,7 @@ class FoldApp(App):
         yield Footer()
         yield Tree("root", id="tree")
 
-    def action_exit(self):
+    def action_quit(self):
         self.exit()
 
     def action_toggle_dark(self) -> None:
