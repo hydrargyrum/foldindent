@@ -7,8 +7,10 @@ import sys
 from dataclasses import dataclass, field
 
 from textual.app import App, ComposeResult
+from textual.binding import Binding
 from textual.keys import Keys
-from textual.widgets import Footer, Tree as _Tree
+from textual.screen import ModalScreen
+from textual.widgets import Footer, Tree as _Tree, Input
 from textual.widgets.tree import TreeNode
 
 __version__ = "0.3.0"
@@ -59,11 +61,16 @@ class Tree(_Tree):
         (Keys.Right, "expand_current", "Expand"),
     ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.nodelist = {}
+
     def action_go_to_parent(self):
         self.select_node(self.cursor_node.parent)
         self.scroll_to_node(self.cursor_node)
 
     def action_fold_current(self):
+        #q(self.cursor_node.id)
         if self.cursor_node.children and self.cursor_node.is_expanded:
             self.cursor_node.collapse()
         else:
@@ -81,15 +88,82 @@ class Tree(_Tree):
             self.cursor_node.expand()
 
 
+class InputScreen(ModalScreen):
+    BINDINGS = [
+        Binding("escape", "cancel"),
+    ]
+
+    def __init__(self, value):
+        super().__init__()
+        self.init_value = value
+
+    def compose(self):
+        yield Input(value=self.init_value)
+
+    def on_input_submitted(self, message):
+        self.dismiss(message.value)
+
+    def action_cancel(self):
+        self.dismiss(None)
+
+
+class Searcher:
+    def __init__(self, app):
+        self.app = app
+        self.pattern = ""
+
+    def _new_coordinates_down(self, idx):
+        return (idx + 1) % len(self.app.tree.nodelist)
+
+    def _new_coordinates_up(self, idx):
+        return (idx - 1) % len(self.app.tree.nodelist)
+
+    def _do_search(self, increment):
+        if not self.pattern:
+            return
+
+        tree = self.app.tree
+        idx = max(0, tree.cursor_line)
+        start = idx
+        while True:
+            idx = (idx + increment) % (tree.last_line + 1)
+            if start == idx:
+                break
+
+            node = tree.get_node_at_line(idx)
+            if node is tree.root:
+                continue
+
+            _, text = tree.nodelist[node.id]
+            if self.pattern in text.lower():
+                tree.select_node(node)
+                tree.scroll_to_node(node)
+                break
+
+    def next(self):
+        self._do_search(1)
+
+    def previous(self):
+        self._do_search(-1)
+
+
 class FoldApp(App):
     BINDINGS = [
         ("d", "toggle_dark", "Toggle dark mode"),
         ("q", "quit", "Quit"),
+        ("/", "search", "Search"),
+        ("n", "search_next", "Next"),
+        ("N", "search_prev", "Previous"),
     ]
 
     def __init__(self, data):
         super().__init__()
         self.data = data
+        self.searcher = Searcher(self)
+
+    @property
+    def tree(self):
+        return self.query_one(Tree)
 
     def compose(self) -> ComposeResult:
         yield Footer()
@@ -102,14 +176,10 @@ class FoldApp(App):
         self.dark = not self.dark
 
     def on_mount(self):
-        self.query_one("#tree").focus()
         self.feed(self.data)
 
-    def search_hidden(self):
-        self.query_one("#tree").focus()
-
     def feed(self, data: Node):
-        tree = self.query_one(Tree)
+        tree = self.tree
 
         def recurse(tnode: TreeNode, dnode: Node):
             for sdnode in dnode.children:
@@ -117,10 +187,28 @@ class FoldApp(App):
                     stnode = tnode.add(sdnode.value)
                     recurse(stnode, sdnode)
                 else:
-                    tnode.add_leaf(sdnode.value)
+                    stnode = tnode.add_leaf(sdnode.value)
+
+                tree.nodelist[stnode.id] = (stnode, sdnode.value)
 
         recurse(tree.root, data)
         tree.root.expand_all()
+
+    def action_search(self):
+        def on_dismiss(value):
+            if not value:
+                return
+
+            self.searcher.pattern = value.lower()
+            self.action_search_next()
+
+        self.app.push_screen(InputScreen(self.searcher.pattern), on_dismiss)
+
+    def action_search_next(self):
+        self.searcher.next()
+
+    def action_search_previous(self):
+        self.searcher.previous()
 
 
 def main():
