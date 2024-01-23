@@ -1,8 +1,10 @@
 # foldindent - indented text viewer with folding
 
-foldindent is a terminal user interface (TUI) for viewing indented text files with the possibility to fold parts based on indentation.
+`foldindent` is a terminal user interface (TUI) for viewing indented text files with the possibility to fold parts based on indentation.
+`foldindent` can view arbitrary text files.
 
-foldindent can view arbitrary text files.
+`foldindent` can be seen as pager dedicated to indented text data.
+
 Each time lines are more indented than previous lines, a foldable point is added in the UI.
 
 ## Samples
@@ -21,6 +23,8 @@ Each time lines are more indented than previous lines, a foldable point is added
 
 - `Enter`: fold/expand a node
 - `Up/Down`: navigate cursor one node above/below
+- `^`: jump to parent node
+
 ## Install
 
-`pipx install foldindent`
+[`pipx install foldindent`](https://pypi.org/project/foldindent/)
