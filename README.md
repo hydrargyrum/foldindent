@@ -28,3 +28,20 @@ Each time lines are more indented than previous lines, a foldable point is added
 ## Install
 
 [`pipx install foldindent`](https://pypi.org/project/foldindent/)
+
+## Keybindings
+
+- `left`: collapse/go to parent
+- `right` : expand/go to first child
+- `up`: go up
+- `down`: go down
+- `enter`: toggle expand/collapse
+- `^`: go to parent
+- `shift-left`: collapse all children
+- `shift-right`: expand all children
+- `shift-up`: go to previous sibling
+- `shift-down`: go to next sibling
+- `/`: search
+- `n`: previous search result
+- `N`: next search result
+- `q`: quit

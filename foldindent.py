@@ -5,6 +5,7 @@ import argparse
 import bisect
 import sys
 from dataclasses import dataclass, field
+from functools import partialmethod
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
@@ -59,6 +60,10 @@ class Tree(_Tree):
         ("^", "go_to_parent", "Parent"),
         (Keys.Left, "fold_current", "Parent"),
         (Keys.Right, "expand_current", "Expand"),
+        Binding("shift+left", "recurse_collapse"),
+        Binding("shift+right", "recurse_expand"),
+        Binding("shift+up", "prev_sibling"),
+        Binding("shift+down", "next_sibling"),
     ]
 
     def __init__(self, *args, **kwargs):
@@ -86,6 +91,29 @@ class Tree(_Tree):
             self.scroll_to_node(self.cursor_node)
         else:
             self.cursor_node.expand()
+
+    def action_recurse_expand(self):
+        if not self.cursor_node.children:
+            return
+        self.cursor_node.expand_all()
+
+    def action_recurse_collapse(self):
+        if not self.cursor_node.children:
+            return
+        self.cursor_node.collapse_all()
+
+    def _action_sibling(self, direction):
+        if self.cursor_node.is_root:
+            return
+        siblings = list(self.cursor_node.parent.children)
+        #assert False, list(siblings) #f"{dir(siblings)} {self.cursor_node.line}"
+        pos = siblings.index(self.cursor_node)
+        child = siblings[max(0, min(pos + direction, len(siblings) - 1))]
+        self.select_node(child)
+        self.scroll_to_node(child)
+
+    action_prev_sibling = partialmethod(_action_sibling, direction=-1)
+    action_next_sibling = partialmethod(_action_sibling, direction=+1)
 
 
 class InputScreen(ModalScreen):
