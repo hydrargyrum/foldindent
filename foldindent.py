@@ -14,7 +14,7 @@ from textual.screen import ModalScreen
 from textual.widgets import Footer, Tree as _Tree, Input
 from textual.widgets.tree import TreeNode
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 
 @dataclass
