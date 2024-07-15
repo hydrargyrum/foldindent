@@ -248,8 +248,11 @@ def main():
     with args.file:
         text = args.file.read()
 
-    if args.file is sys.stdin:
-        sys.stdin = open("/dev/tty")
+    if args.file is sys.__stdin__:
+        # textual accesses sys.__stdin__
+        # it's used for reading data input and user input
+        # force textual to read user input from terminal
+        sys.__stdin__ = open("/dev/tty")
 
     DATA = parse_indented(text)
 
