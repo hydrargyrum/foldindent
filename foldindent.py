@@ -57,13 +57,13 @@ def parse_indented(text):
 
 class Tree(_Tree):
     BINDINGS = [
-        ("^", "go_to_parent", "Parent"),
-        (Keys.Left, "fold_current", "Parent"),
-        (Keys.Right, "expand_current", "Expand"),
-        Binding("shift+left", "recurse_collapse"),
-        Binding("shift+right", "recurse_expand"),
-        Binding("shift+up", "prev_sibling"),
-        Binding("shift+down", "next_sibling"),
+        Binding(Keys.Left, "fold_current", "Collapse"),
+        Binding(Keys.Right, "expand_current", "Expand"),
+        Binding("shift+left", "recurse_collapse", "Collapse tree"),
+        Binding("shift+right", "recurse_expand", "Expand tree"),
+        Binding("shift+up", "prev_sibling", "Previous sibling"),
+        Binding("shift+down", "next_sibling", "Next sibling"),
+        Binding("^", "go_to_parent", "Parent"),
     ]
 
     def __init__(self, *args, **kwargs):
