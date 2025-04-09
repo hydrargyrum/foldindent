@@ -26,7 +26,7 @@ class Node:
 def _print_nodes(node, indent=0):
     print(indent * "  ", node.value)
     for c in node.children:
-        print_nodes(c, indent + 1)
+        _print_nodes(c, indent + 1)
 
 
 def parse_indented(text):
@@ -75,7 +75,7 @@ class Tree(_Tree):
         self.scroll_to_node(self.cursor_node)
 
     def action_fold_current(self):
-        #q(self.cursor_node.id)
+        # q(self.cursor_node.id)
         if self.cursor_node.children and self.cursor_node.is_expanded:
             self.cursor_node.collapse()
         else:
@@ -106,7 +106,6 @@ class Tree(_Tree):
         if self.cursor_node.is_root:
             return
         siblings = list(self.cursor_node.parent.children)
-        #assert False, list(siblings) #f"{dir(siblings)} {self.cursor_node.line}"
         pos = siblings.index(self.cursor_node)
         child = siblings[max(0, min(pos + direction, len(siblings) - 1))]
         self.select_node(child)
