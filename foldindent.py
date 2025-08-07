@@ -240,7 +240,9 @@ class FoldApp(App):
 
 def main():
     argparser = argparse.ArgumentParser()
-    argparser.add_argument("file", type=argparse.FileType('r'), nargs="?", default=sys.stdin)
+    argparser.add_argument(
+        "file", type=argparse.FileType('r'), nargs="?", default=sys.stdin,
+    )
     argparser.add_argument("--version", action="version", version=__version__)
     args = argparser.parse_args()
 
